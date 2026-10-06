@@ -4,7 +4,6 @@ namespace App\Livewire\Calendar;
 
 use App\Models\AuditLog;
 use App\Models\Event;
-use App\Models\InboxItem;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -12,10 +11,10 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout('components.layouts.app')]
-#[Title('Nuevo Evento - Mi Asistente')]
-class Create extends Component
+#[Title('Editar Evento - Mi Asistente')]
+class Edit extends Component
 {
-    public ?int $inbox_item_id = null;
+    public Event $event;
 
     public string $titulo = '';
 
@@ -35,18 +34,19 @@ class Create extends Component
 
     public ?string $notas = '';
 
-    public function mount()
+    public function mount(int $id)
     {
-        $this->fecha = Carbon::today()->format('Y-m-d');
-        $this->hora_inicio = Carbon::now()->addHour()->startOfHour()->format('H:i');
+        $this->event = Event::where('user_id', Auth::id())->findOrFail($id);
 
-        $this->inbox_item_id = request()->query('inbox_item_id');
-        if ($this->inbox_item_id) {
-            $inboxItem = InboxItem::where('user_id', Auth::id())->find($this->inbox_item_id);
-            if ($inboxItem) {
-                $this->descripcion = $inboxItem->content;
-            }
-        }
+        $this->titulo = $this->event->titulo;
+        $this->descripcion = $this->event->descripcion;
+        $this->fecha = $this->event->fecha->format('Y-m-d');
+        $this->hora_inicio = $this->event->hora_inicio ? substr($this->event->hora_inicio, 0, 5) : '';
+        $this->hora_fin = $this->event->hora_fin ? substr($this->event->hora_fin, 0, 5) : '';
+        $this->duracion = $this->event->duracion;
+        $this->ubicacion = $this->event->ubicacion;
+        $this->prioridad = $this->event->prioridad;
+        $this->notas = $this->event->notas;
     }
 
     protected function rules(): array
@@ -73,17 +73,16 @@ class Create extends Component
             $start = Carbon::parse($this->fecha.' '.$this->hora_inicio);
             $end = $start->copy()->addMinutes($this->duracion ?: 60);
 
-            // Fetch events on the same day
             $dayEvents = Event::where('user_id', Auth::id())
                 ->where('fecha', $this->fecha)
                 ->whereNotNull('hora_inicio')
+                ->where('id', '!=', $this->event->id)
                 ->get();
 
             foreach ($dayEvents as $e) {
                 $eStart = Carbon::parse($e->fecha.' '.$e->hora_inicio);
                 $eEnd = $eStart->copy()->addMinutes($e->duracion ?: 60);
 
-                // Add 15 min buffer to check
                 if ($start->lt($eEnd->copy()->addMinutes(15)) && $end->gt($eStart->copy()->subMinutes(15))) {
                     $conflict = true;
                     break;
@@ -91,9 +90,7 @@ class Create extends Component
             }
         }
 
-        $event = Event::create([
-            'user_id' => Auth::id(),
-            'inbox_item_id' => $this->inbox_item_id,
+        $this->event->update([
             'titulo' => trim($this->titulo),
             'descripcion' => $this->descripcion ? trim($this->descripcion) : null,
             'fecha' => $this->fecha,
@@ -102,24 +99,18 @@ class Create extends Component
             'duracion' => $this->duracion ?: 60,
             'ubicacion' => $this->ubicacion ? trim($this->ubicacion) : null,
             'prioridad' => $this->prioridad,
-            'estado' => 'confirmado',
-            'origen' => 'manual',
             'notas' => $this->notas ? trim($this->notas) : null,
         ]);
 
-        if ($this->inbox_item_id) {
-            InboxItem::where('id', $this->inbox_item_id)->update(['status' => 'convertido_evento']);
-        }
-
-        AuditLog::log('evento_creado', $event, [
-            'titulo' => $event->titulo,
-            'fecha' => $event->fecha->toDateString(),
+        AuditLog::log('evento_actualizado', $this->event, [
+            'titulo' => $this->event->titulo,
+            'fecha' => $this->event->fecha->toDateString(),
         ]);
 
         if (isset($conflict) && $conflict) {
-            session()->flash('warning', 'Evento añadido, pero ten cuidado: hay un solapamiento o menos de 15 minutos de margen con otro evento ese día.');
+            session()->flash('warning', 'Evento actualizado, pero ten cuidado: hay un solapamiento o menos de 15 minutos de margen con otro evento ese día.');
         } else {
-            session()->flash('success', 'Evento añadido al calendario.');
+            session()->flash('success', 'Evento actualizado correctamente.');
         }
 
         return redirect()->route('calendar.index');
@@ -127,6 +118,6 @@ class Create extends Component
 
     public function render()
     {
-        return view('livewire.calendar.create');
+        return view('livewire.calendar.edit');
     }
 }

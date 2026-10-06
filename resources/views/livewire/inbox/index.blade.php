@@ -111,6 +111,14 @@
                     </p>
 
                     <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800/60 text-xs">
+                        @if ($item->status !== 'archivado' && !str_starts_with($item->status, 'convertido_'))
+                            <a href="{{ route('calendar.create', ['inbox_item_id' => $item->id]) }}" class="px-2.5 py-1 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg cursor-pointer">
+                                Evento
+                            </a>
+                            <a href="{{ route('tasks.create', ['inbox_item_id' => $item->id]) }}" class="px-2.5 py-1 text-sky-400 hover:text-sky-300 hover:bg-sky-500/10 rounded-lg cursor-pointer">
+                                Tarea
+                            </a>
+                        @endif
                         @if ($item->status !== 'archivado')
                             <button 
                                 wire:click="archive({{ $item->id }})"

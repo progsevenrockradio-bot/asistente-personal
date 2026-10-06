@@ -105,6 +105,13 @@
                 <span>{{ session('success') }}</span>
             </div>
         @endif
+        
+        @if (session('warning'))
+            <div class="mb-5 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs sm:text-sm font-medium flex items-center gap-2">
+                <span class="text-base">⚠️</span>
+                <span>{{ session('warning') }}</span>
+            </div>
+        @endif
 
         {{ $slot }}
     </main>
@@ -148,11 +155,19 @@
             </a>
 
             <!-- BANDEJA -->
-            <a href="{{ route('inbox.index') }}" class="flex flex-col items-center py-1 px-2.5 rounded-xl transition-colors {{ request()->routeIs('inbox.*') ? 'text-indigo-400 font-bold' : 'hover:text-slate-200' }}">
+            <a href="{{ route('inbox.index') }}" class="relative flex flex-col items-center py-1 px-2.5 rounded-xl transition-colors {{ request()->routeIs('inbox.*') ? 'text-indigo-400 font-bold' : 'hover:text-slate-200' }}">
                 <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
                 <span>BANDEJA</span>
+                @php
+                    $pendingCount = \App\Models\InboxItem::where('user_id', auth()->id())->whereIn('status', ['pendiente_analisis', 'necesita_informacion'])->count();
+                @endphp
+                @if($pendingCount > 0)
+                    <span class="absolute top-0 right-1 -mt-1 -mr-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white">
+                        {{ $pendingCount > 9 ? '9+' : $pendingCount }}
+                    </span>
+                @endif
             </a>
         </div>
     </nav>
@@ -163,7 +178,14 @@
             <a href="{{ route('dashboard') }}" class="px-4 py-2 rounded-full transition-all {{ request()->routeIs('dashboard') ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white' }}">HOY</a>
             <a href="{{ route('calendar.index') }}" class="px-4 py-2 rounded-full transition-all {{ request()->routeIs('calendar.*') ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white' }}">CALENDARIO</a>
             <a href="{{ route('tasks.index') }}" class="px-4 py-2 rounded-full transition-all {{ request()->routeIs('tasks.*') ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white' }}">TAREAS</a>
-            <a href="{{ route('inbox.index') }}" class="px-4 py-2 rounded-full transition-all {{ request()->routeIs('inbox.*') ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white' }}">BANDEJA</a>
+            <a href="{{ route('inbox.index') }}" class="relative px-4 py-2 rounded-full transition-all {{ request()->routeIs('inbox.*') ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white' }}">
+                BANDEJA
+                @if($pendingCount > 0)
+                    <span class="absolute top-0 right-0 -mt-1 -mr-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white shadow-sm">
+                        {{ $pendingCount > 9 ? '9+' : $pendingCount }}
+                    </span>
+                @endif
+            </a>
             <a href="{{ route('documents.index') }}" class="px-4 py-2 rounded-full transition-all {{ request()->routeIs('documents.*') ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white' }}">DOCUMENTOS</a>
             <a href="{{ route('assistant.index') }}" class="px-4 py-2 rounded-full transition-all {{ request()->routeIs('assistant.*') ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white' }}">ASISTENTE</a>
             <a href="{{ route('settings.index') }}" class="px-4 py-2 rounded-full transition-all {{ request()->routeIs('settings.*') ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white' }}">AJUSTES</a>

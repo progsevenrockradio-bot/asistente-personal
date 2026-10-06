@@ -6,11 +6,13 @@ use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Calendar\Create as CalendarCreate;
+use App\Livewire\Calendar\Edit;
 use App\Livewire\Calendar\Index as CalendarIndex;
 use App\Livewire\Dashboard;
 use App\Livewire\Documents\Index as DocumentsIndex;
 use App\Livewire\Inbox\Index as InboxIndex;
 use App\Livewire\Settings\Index as SettingsIndex;
+use App\Livewire\Tasks\Create;
 use App\Livewire\Tasks\Index as TasksIndex;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -51,8 +53,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/calendar', CalendarIndex::class)->name('calendar.index');
     Route::get('/calendar/create', CalendarCreate::class)->name('calendar.create');
+    Route::get('/calendar/{id}/edit', Edit::class)->name('calendar.edit');
 
     Route::get('/tasks', TasksIndex::class)->name('tasks.index');
+    Route::get('/tasks/create', Create::class)->name('tasks.create');
+    Route::get('/tasks/{id}/edit', App\Livewire\Tasks\Edit::class)->name('tasks.edit');
     Route::get('/documents', DocumentsIndex::class)->name('documents.index');
     Route::get('/assistant', AssistantIndex::class)->name('assistant.index');
     Route::get('/settings', SettingsIndex::class)->name('settings.index');
