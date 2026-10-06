@@ -10,8 +10,11 @@ Centraliza la gestión personal integrando:
 - QuickCapture para captura rápida de pensamientos.
 - Asistencia mediante IA (planificada para futuras fases).
 
-## Requisitos del Servidor
+## Requisitos y Configuración
 - **PHP:** 8.3+
+- **Node.js:** 20+
+- **Laravel:** 11.x
+- **Zona Horaria:** El sistema está configurado por defecto para `Europe/Madrid`. Puede ajustarse modificando `APP_TIMEZONE` en el `.env`.
 - **Base de datos:** MySQL / MariaDB (o SQLite para entorno local/testing).
 - **Entorno Hostinger Compartido:** Al no disponer de workers persistentes, el sistema de colas y comandos programados se ejecuta mediante `cron` (`queue:work --stop-when-empty` y `schedule:run`).
 
