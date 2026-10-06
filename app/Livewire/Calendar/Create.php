@@ -117,7 +117,7 @@ class Create extends Component
         ]);
 
         if (isset($conflict) && $conflict) {
-            session()->flash('warning', 'Evento añadido, pero ten cuidado: hay un solapamiento o menos de 15 minutos de margen con otro evento ese día.');
+            session()->flash('warning', 'Evento añadido, pero hay un solapamiento (o menos de 15 minutos de margen) con otro evento ese día. Considera moverlo 30 minutos antes o después.');
         } else {
             session()->flash('success', 'Evento añadido al calendario.');
         }

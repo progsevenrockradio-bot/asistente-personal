@@ -108,7 +108,7 @@ class Edit extends Component
         ]);
 
         if (isset($conflict) && $conflict) {
-            session()->flash('warning', 'Evento actualizado, pero ten cuidado: hay un solapamiento o menos de 15 minutos de margen con otro evento ese día.');
+            session()->flash('warning', 'Evento actualizado, pero hay un solapamiento (o menos de 15 minutos de margen) con otro evento ese día. Considera moverlo 30 minutos antes o después.');
         } else {
             session()->flash('success', 'Evento actualizado correctamente.');
         }

@@ -19,7 +19,7 @@ class Index extends Component
 
     public ?string $newDueDate = null;
 
-    public string $filter = 'pendientes'; // pendientes, completadas, todas
+    public string $filter = 'todas'; // todas, hoy, vencidas, sin_fecha
 
     protected function rules(): array
     {
@@ -55,17 +55,23 @@ class Index extends Component
     {
         $task = Task::where('user_id', Auth::id())->findOrFail($id);
 
-        if ($task->estado === 'completada') {
-            $task->update([
-                'estado' => 'pendiente',
-                'completed_at' => null,
-            ]);
-        } else {
-            $task->update([
-                'estado' => 'completada',
-                'completed_at' => now(),
-            ]);
+        $states = ['pendiente', 'en_proceso', 'completada', 'bloqueada', 'pospuesta'];
+        $currentIndex = array_search($task->estado, $states);
+        $nextState = $states[($currentIndex + 1) % count($states)];
+
+        // If next state is completed, check dependency
+        if ($nextState === 'completada' && $task->dependencia_id) {
+            $parent = Task::find($task->dependencia_id);
+            if ($parent && $parent->estado !== 'completada') {
+                session()->flash('warning', 'No puedes completar esta tarea porque depende de "'.$parent->titulo.'" que aún no está completada.');
+                return;
+            }
         }
+
+        $task->update([
+            'estado' => $nextState,
+            'completed_at' => $nextState === 'completada' ? now() : null,
+        ]);
     }
 
     public function deleteTask(int $id)
@@ -78,8 +84,9 @@ class Index extends Component
     public function render()
     {
         $tasks = Task::where('user_id', Auth::id())
-            ->when($this->filter === 'pendientes', fn ($q) => $q->where('estado', '!=', 'completada'))
-            ->when($this->filter === 'completadas', fn ($q) => $q->where('estado', 'completada'))
+            ->when($this->filter === 'hoy', fn ($q) => $q->whereDate('fecha_limite', now()->toDateString()))
+            ->when($this->filter === 'vencidas', fn ($q) => $q->where('estado', '!=', 'completada')->whereDate('fecha_limite', '<', now()->toDateString()))
+            ->when($this->filter === 'sin_fecha', fn ($q) => $q->whereNull('fecha_limite'))
             ->orderByRaw("CASE prioridad WHEN 'URGENTE' THEN 1 WHEN 'IMPORTANTE' THEN 2 WHEN 'NORMAL' THEN 3 WHEN 'PUEDE_ESPERAR' THEN 4 ELSE 5 END")
             ->orderBy('fecha_limite')
             ->get();

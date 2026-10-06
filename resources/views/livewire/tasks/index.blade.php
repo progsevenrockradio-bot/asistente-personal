@@ -6,22 +6,28 @@
         </div>
         <div class="flex items-center gap-2">
             <button 
-                wire:click="$set('filter', 'pendientes')"
-                class="px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer {{ $filter === 'pendientes' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white bg-slate-900' }}"
-            >
-                Pendientes
-            </button>
-            <button 
-                wire:click="$set('filter', 'completadas')"
-                class="px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer {{ $filter === 'completadas' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white bg-slate-900' }}"
-            >
-                Completadas
-            </button>
-            <button 
                 wire:click="$set('filter', 'todas')"
                 class="px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer {{ $filter === 'todas' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white bg-slate-900' }}"
             >
                 Todas
+            </button>
+            <button 
+                wire:click="$set('filter', 'hoy')"
+                class="px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer {{ $filter === 'hoy' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white bg-slate-900' }}"
+            >
+                Hoy
+            </button>
+            <button 
+                wire:click="$set('filter', 'vencidas')"
+                class="px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer {{ $filter === 'vencidas' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white bg-slate-900' }}"
+            >
+                Vencidas
+            </button>
+            <button 
+                wire:click="$set('filter', 'sin_fecha')"
+                class="px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer {{ $filter === 'sin_fecha' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white bg-slate-900' }}"
+            >
+                Sin Fecha
             </button>
         </div>
     </div>
@@ -93,6 +99,9 @@
                     </div>
 
                     <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[9px] px-2 py-0.5 rounded-full font-bold uppercase bg-slate-800 text-slate-300">
+                            {{ str_replace('_', ' ', $task->estado) }}
+                        </span>
                         <span class="text-[9px] px-2 py-0.5 rounded-full font-bold uppercase
                             {{ $task->prioridad === 'URGENTE' ? 'bg-rose-500/20 text-rose-300' : '' }}
                             {{ $task->prioridad === 'IMPORTANTE' ? 'bg-amber-500/20 text-amber-300' : '' }}
