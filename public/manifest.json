@@ -1,0 +1,40 @@
+{
+  "name": "Mi Asistente Personal",
+  "short_name": "Mi Asistente",
+  "description": "Tu asistente personal automatizado para citas, calendario, tareas y notas",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#0b1120",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Captura Rápida",
+      "short_name": "Capturar",
+      "description": "Añadir nota rápida por voz o texto",
+      "url": "/inbox",
+      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Calendario",
+      "short_name": "Agenda",
+      "description": "Ver eventos y citas",
+      "url": "/calendar",
+      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192" }]
+    }
+  ]
+}
